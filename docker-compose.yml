@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  cozy-stack:
+    build:
+      context: .
+      args:
+        envfile: ".env"
+    image: cozy-stack
+    # restart: always # Optional
+    links:
+      - couchdb
+    ports:
+      - ${cozy_port}:8080
+      - ${cozy_admin_port}:6060
+    # volumes:
+    #   - "cozy-stack-etc:/etc/cozy"
+    #   - "cozy-stack-var-log:/var/log/cozy"
+    #   - "cozy-stack-var-lib:/var/lib/cozy"
+    #   - "cozy-stack-storage:/usr/local/bin/storage"
+  couchdb:
+    image: couchdb:2.3
+    # restart: always # Optional
+    volumes:
+      - "cozy-stack-db:/opt/couchdb/data"
+      - ${stack_root}/couchdb/local.d:/opt/couchdb/etc/local.d
+    env_file: ".env"
+    environment:
+      COUCHDB_USER: ${cozyuser}
+      COUCHDB_PASSWORD: ${cozypass}
+
+volumes:
+  # cozy-stack_images:
+  #   name: "cozy-stack_images${vol_postfix}"
+  cozy-stack-db:
+    name: "cozy-stack-db"
+  # cozy-stack_settings:
+  #   name: "cozy-stack_settings${vol_postfix}"
